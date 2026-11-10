@@ -1,15 +1,11 @@
 #![deny(deprecated)]
 #![allow(unused)]
 #![allow(non_snake_case)]
-#![deny(deprecated)]
-#![allow(unused)]
-#![allow(non_snake_case)]
 
 pub mod acmd;
 
 pub mod opff;
-//pub mod status;
-
+pub mod status;
 
 use smash::{
     lib::{
@@ -34,6 +30,7 @@ use smash_script::{
     *,
     macros::*
 };
+use smash_script::macros::ATTACK_ABS;
 use utils::{
     *,
     util::*,
@@ -45,8 +42,8 @@ use smashline::*;
 
 pub fn install() {
     let agent = &mut Agent::new("lucina");
-    opff::install(agent);
     acmd::install(agent);
-    //status::install(agent);
+    opff::install(agent);
+    status::install(agent);
     agent.install();
 }

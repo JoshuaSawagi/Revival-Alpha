@@ -35,7 +35,6 @@ unsafe extern "C" fn special_lw_main_motion_helper(fighter: &mut L2CFighterCommo
             MotionModule::change_motion_inherit_frame_keep_rate(fighter.module_accessor, Hash40::new_raw(mot), -1.0, 1.0, 0.0);
         }
     }
-
 }
 
 unsafe extern "C" fn special_lw_check_follow_up(fighter: &mut L2CFighterCommon) {
@@ -95,9 +94,6 @@ unsafe extern "C" fn special_lw_main_loop(fighter: &mut L2CFighterCommon) -> L2C
     0.into()
 }
 
-
-pub fn install() {
-    smashline::Agent::new("lucina")
-        .status(Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_main)
-        .install();
+pub fn install(agent: &mut Agent) {
+    agent.status(Main, *FIGHTER_STATUS_KIND_SPECIAL_LW, special_lw_main);
 }

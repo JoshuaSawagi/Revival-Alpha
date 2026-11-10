@@ -29,6 +29,7 @@ use smash_script::{
     *,
     macros::*
 };
+use smash_script::macros::ATTACK_ABS;
 use utils::{
     *,
     util::*,
@@ -37,6 +38,7 @@ use utils::{
 };
 use smashline::*;
 #[macro_use] extern crate smash_script;
+
 
 pub fn install() {
     let agent = &mut Agent::new("falco");
