@@ -1,0 +1,36 @@
+use super::*;
+use crate::globals::*;
+use crate::opff::physics::get_player_number;
+
+pub mod collision;
+pub mod controls;
+pub mod params;
+pub mod energy;
+pub mod kinetic;
+pub mod momentum_transfer;
+pub mod transition;
+mod lua_bind_hook;
+mod game;
+pub mod knockback;
+pub mod knockback_utils;
+pub mod dashdancing;
+pub fn install() {
+    controls::install();
+    collision::install();
+    params::install();
+    energy::install();
+    kinetic::install();
+    momentum_transfer::install();
+    transition::install();
+    lua_bind_hook::install();
+    game::install();
+    dashdancing::install();
+    //knockback::install();
+    //knockback_utils::install();
+    unsafe {
+        // Matches Melee behavior
+        skyline::patching::Patch::in_text(0x3e6d08).data(0x14000012u32);
+    }
+    let _ = skyline::patching::Patch::in_text(0x633de0).nop();
+    let _ = skyline::patching::Patch::in_text(0x6373a4).data(0xD503201Fu32);
+}
