@@ -93,6 +93,7 @@ pub mod vars {
             pub const OCCUPIED_LEDGE_ID_FOR_TETHERS: i32 = 0x0016;
             pub const TEMPORARY_CLIFF_STOP: i32 = 0x0061;
             pub const TETHER_HOGGED: i32 = 0x0018;
+            pub const IS_STICKY_WALK: i32 = 0x102;
 
             // ints
             pub const COSTUME_SLOT_NUMBER: i32 = 0x0001;
@@ -161,6 +162,9 @@ pub mod vars {
             pub const DAMAGE_DEALT_THIS_STOCK: i32 = 0x097;
             pub const WAVELAND_SPEED_X: i32 = 0x098;
             pub const WAVELAND_PENDING: i32 = 0x099;
+            pub const ENABLE_BOOST_RUN: i32 = 0x100;
+            pub const TURN_DASH_FRAME: i32 = 0x101;
+            pub const MOONWALK_SPEED: i32 = 0x103;
         }
 
         pub mod status {
@@ -197,13 +201,8 @@ pub mod vars {
             pub const RESTING_HIP_OFFSET_Y: i32 = 0x1003;
 
             //Meteor Cancel Flags
-            pub const METEOR_CANCEL_USED: i32 = 0x1004;
-            pub const METEOR_CANCEL_AVAILABLE: i32 = 0x1005;
-            pub const METEOR_CANCEL_TIMER: i32 = 0x1006;
             pub const TELEPORT_INITIAL_SPEED_X: i32 = 0x1011;
             pub const TELEPORT_INITIAL_SPEED_Y: i32 = 0x1012;
-            pub const ESCAPE_AIR_CANCEL_FRAME: i32 = 0x0086;
-            pub const METEOR_FLY: i32 = 0x0087;
         }
     }
 
@@ -226,6 +225,14 @@ pub mod vars {
         }
     }
 
+    pub mod duckhunt {
+        pub mod instance {
+            // flags
+            pub const GUNMAN_TIMER: i32 = 0x0100;
+        }
+    }
+
+
     pub mod falco {
         pub mod instance {
             // flags
@@ -247,6 +254,12 @@ pub mod vars {
         pub mod instance {
             // flags
             pub const SPECIAL_LW_DISABLE_JC: i32 = 0x0100;
+        }
+        
+        pub mod status {
+            // flags
+            pub const ILLUSION_SHORTENED: i32 = 0x1100;
+            pub const ILLUSION_SHORTEN: i32 = 0x1101;
         }
     }
 
@@ -279,12 +292,8 @@ pub mod vars {
             pub const SPECIAL_S_GROUND_START: i32 = 0x1101;
             pub const SPECIAL_S_INSTAKILL_CHECK_HIT: i32 = 0x1102;
             pub const SPECIAL_S_INSTAKILL_HIT: i32 = 0x1103;
+            pub const IS_QUICK_DRAW_INSTAKILL: i32 = 0x1104;
         }
-    }
-
-
-    pub mod littlemac {
-        
     }
 
     pub mod lucario {
@@ -420,6 +429,8 @@ pub mod vars {
         }
         pub mod status {
             // flags
+            pub const ILLUSION_SHORTENED: i32 = 0x1100;
+            pub const ILLUSION_SHORTEN: i32 = 0x1101;
             pub const SPECIAL_S_DISABLE: i32 = 0x1100;
         }
     }
@@ -521,7 +532,3 @@ pub static mut SHOULD_END_RESULT_SCREEN: bool = false;
 pub const FIGHTER_INSTANCE_WORK_ID_FLAG_CALCULATING_ECB: LuaConst = LuaConst::new(0x2000011D);
 pub const FIGHTER_INSTANCE_WORK_ID_FLOAT_ECB_OFFSET_B: LuaConst = LuaConst::new(0x645);
 pub const FIGHTER_INSTANCE_WORK_ID_FLOAT_ECB_OFFSET_C: LuaConst = LuaConst::new(0x646);
-
-
-pub const WAVELAND_MIN_DOWN_STICK: f32 = 0.2875;
-pub const AIRDODGE_SPEED: f32 = 3.0; // placeholder: your air dodge's first-frame speed

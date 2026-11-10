@@ -534,7 +534,6 @@ pub trait BomaExt {
     unsafe fn get_controller_energy(&mut self) -> &mut FighterKineticEnergyController;
 
     // tech/general subroutines
-    unsafe fn handle_waveland(&mut self, require_airdodge: bool) -> bool;
     unsafe fn set_front_cliff_hangdata(&mut self, x: f32, y: f32);
     unsafe fn set_back_cliff_hangdata(&mut self, x: f32, y: f32);
     unsafe fn set_center_cliff_hangdata(&mut self, x: f32, y: f32);
@@ -545,7 +544,7 @@ pub trait BomaExt {
 
 
     // Checks for status and enables transition to jump
-    unsafe fn check_jump_cancel(&mut self, update_lr: bool, skip_usmash_check: bool, skip_parry_check: bool) -> bool;
+    unsafe fn check_jump_cancel(&mut self);
     // Checks for status and enables transition to airdodge
     unsafe fn check_airdodge_cancel(&mut self) -> bool;
     unsafe fn check_aerial_cancel(&mut self) -> bool;
@@ -1161,68 +1160,19 @@ impl BomaExt for BattleObjectModuleAccessor {
     /// If update_lr is true, we set your facing direction based on your stick position
     /// If skip_usmash_check is true, we do not check for USmash
     /// If skip_disable_parry_check is true, we do not disable jump cancel on parry
-    unsafe fn check_jump_cancel(&mut self, update_lr: bool, skip_usmash_check: bool, skip_disable_parry_check: bool) -> bool {
-
-        if !skip_disable_parry_check
-        && AttackModule::is_infliction_status(self, *crate::consts::COLLISION_KIND_MASK_PARRY) {
-            return false;
-        }
-
+    unsafe fn check_jump_cancel(&mut self) {
         let fighter = crate::util::get_fighter_common_from_accessor(self);
         if fighter.is_situation(*SITUATION_KIND_GROUND) {
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT,
-            );
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT_BUTTON,
-            );
-            if !skip_usmash_check {
-                WorkModule::enable_transition_term(
-                    fighter.module_accessor,
-                    *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START,
-                );
-            }
-            if fighter.sub_transition_group_check_ground_jump_mini_attack().get_bool() // buffered aerials
-            || (!skip_usmash_check && fighter.sub_transition_group_check_ground_attack().get_bool()) // up smash
-            || fighter.sub_transition_group_check_ground_jump().get_bool() // regular jumps
-            {
-                if update_lr {
-                    PostureModule::set_stick_lr(self, 0.0);
-                    PostureModule::update_rot_y_lr(self);
-                }
-                return true;
-            }
-        } else {
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL,
-            );
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL_BUTTON,
-            );
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_FLY,
-            );
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_FLY_BUTTON,
-            );
-            WorkModule::enable_transition_term(
-                fighter.module_accessor,
-                *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_FLY_NEXT,
-            );
-            if fighter
-                .sub_transition_group_check_air_jump_aerial()
-                .get_bool()
-            {
-                return true;
-            }
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT_BUTTON);
+            fighter.sub_transition_group_check_ground_jump_mini_attack();
+            fighter.sub_transition_group_check_ground_jump();
         }
-        false
+        else {
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL_BUTTON);
+            fighter.sub_transition_group_check_air_jump_aerial();
+        }
     }
 
 
@@ -1296,55 +1246,6 @@ impl BomaExt for BattleObjectModuleAccessor {
 
         false
     }
-
-    unsafe fn handle_waveland(&mut self, require_airdodge: bool) -> bool {
-        if require_airdodge && !self.is_status_one_of(&[*FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE]) {
-            return false;
-        }
-
-        if !crate::VarModule::is_flag(
-            self.object(),
-            crate::consts::vars::common::instance::ENABLE_AIR_ESCAPE_MAGNET,
-        ) {
-            return false;
-        }
-
-        if self.is_prev_status(*FIGHTER_STATUS_KIND_JUMP_SQUAT) {
-            return false;
-        }
-    
-        let pos = *PostureModule::pos(self);
-        let upper_bound_offset_y = if StatusModule::is_changing(self) && !self.is_prev_status(*FIGHTER_STATUS_KIND_PASS) {
-            crate::VarModule::get_float(self.object(), crate::consts::vars::common::instance::ECB_CENTER_Y_OFFSET)
-        } else {
-            crate::VarModule::get_float(self.object(), crate::consts::vars::common::instance::ECB_BOTTOM_Y_OFFSET)
-        };
-        let upper_bound_y = pos.y + upper_bound_offset_y;
-        let snap_leniency = if WorkModule::get_float(self, *FIGHTER_STATUS_ESCAPE_AIR_SLIDE_WORK_FLOAT_DIR_Y) <= 0.0 {
-                upper_bound_offset_y
-            } else {
-                (upper_bound_offset_y).max(6.0)
-            };
-        let lower_bound = Vector2f::new(pos.x, upper_bound_y - snap_leniency);
-        let ground_pos_any = &mut Vector2f::zero();
-        let ground_pos_stage = &mut Vector2f::zero();
-        let is_touch_any = GroundModule::line_segment_check(self, &Vector2f::new(pos.x, upper_bound_y), &lower_bound, &Vector2f::zero(), ground_pos_any, true);
-        let is_touch_stage = GroundModule::line_segment_check(self, &Vector2f::new(pos.x, upper_bound_y), &lower_bound, &Vector2f::zero(), ground_pos_stage, false);
-        let can_snap = !( 
-            is_touch_any == 0 as *const *const u64
-            || (is_touch_stage != 0 as *const *const u64
-                && WorkModule::get_float(self, *FIGHTER_STATUS_ESCAPE_AIR_SLIDE_WORK_FLOAT_DIR_Y) > 0.0)
-        );
-        if can_snap { // pretty sure it returns a pointer, at least it defo returns a non-0 value if success
-            crate::VarModule::on_flag(self.object(), crate::consts::vars::common::status::DISABLE_ECB_SHIFT);
-            PostureModule::set_pos(self, &Vector3f::new(pos.x, ground_pos_any.y + 0.1, pos.z));
-            GroundModule::attach_ground(self, false);
-            true
-        } else {
-            false
-        }
-    }
-
 
     /// Sets the position of the front/red ledge-grab box (see [`set_center_cliff_hangdata`](BomaExt::set_center_cliff_hangdata) for more information)
     ///
