@@ -5,7 +5,7 @@
 pub mod acmd;
 
 pub mod opff;
-
+//pub mod status;
 use smash::{
     lib::{
         L2CValue,
@@ -29,6 +29,7 @@ use smash_script::{
     *,
     macros::*
 };
+use smash_script::macros::ATTACK_ABS;
 use utils::{
     *,
     util::*,
@@ -41,6 +42,7 @@ use smashline::*;
 pub fn install() {
     let agent = &mut Agent::new("marth");
     opff::install(agent);
+    //status::install(agent);
     acmd::install(agent);
     agent.install();
 }

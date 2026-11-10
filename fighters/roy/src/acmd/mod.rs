@@ -13,7 +13,7 @@ pub fn install(agent: &mut Agent) {
     tilts::install(agent);
     smashes::install(agent);
     aerials::install(agent);
-    special_s4::install(agent);
+    //special_s4::install(agent);
     throws::install(agent);
     other::install(agent);
 }

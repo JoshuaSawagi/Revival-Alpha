@@ -7,47 +7,31 @@ pub mod acmd;
 pub mod opff;
 
 use std::f32::consts::PI;
+
 use smash::{
     lib::{
         L2CValue,
         LuaConst,
-        *
     },
     app::{
         *,
         self,
         sv_animcmd::{
             frame,
-            wait,
-            get_value_float
+            wait
         },
-        utility,
-        lua_bind::{
-            *,
-            Article,
-            KineticEnergy,
-            KineticEnergyNormal,
-            FighterKineticEnergyController,
-            FighterManager,
-            FighterInformation,
-            FighterCutInManager
-        }    
+        lua_bind::*
     },
     hash40,
     lib::lua_const::*,
     lua2cpp::*,
-    phx::{
-        *,
-        Hash40,
-        Vector2f,
-        Vector3f
-    },
-
+    phx::*
 };
 use smash_script::{
     *,
     macros::*
 };
+use smash_script::macros::ATTACK_ABS;
 use utils::{
     *,
     util::*,

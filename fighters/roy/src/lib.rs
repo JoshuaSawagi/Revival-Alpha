@@ -42,6 +42,6 @@ pub fn install() {
     let agent = &mut Agent::new("roy");
     opff::install(agent);
     acmd::install(agent);
-    status::install(agent);
+    //status::install(agent);
     agent.install();
 }
