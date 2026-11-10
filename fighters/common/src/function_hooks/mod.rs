@@ -11,9 +11,6 @@ pub mod momentum_transfer;
 pub mod transition;
 mod lua_bind_hook;
 mod game;
-pub mod knockback;
-pub mod knockback_utils;
-pub mod dashdancing;
 pub fn install() {
     controls::install();
     collision::install();
@@ -24,9 +21,6 @@ pub fn install() {
     transition::install();
     lua_bind_hook::install();
     game::install();
-    dashdancing::install();
-    //knockback::install();
-    //knockback_utils::install();
     unsafe {
         // Matches Melee behavior
         skyline::patching::Patch::in_text(0x3e6d08).data(0x14000012u32);
