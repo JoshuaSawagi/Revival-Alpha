@@ -155,7 +155,7 @@ impl KineticEnergy {
 }
 
 pub fn install() {
-    //control::install();
+    control::install();
     motion::install();
     stop::install();
 }
