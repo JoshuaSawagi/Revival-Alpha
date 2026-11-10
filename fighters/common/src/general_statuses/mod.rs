@@ -21,12 +21,11 @@ pub mod jumpsquat;
 pub mod run;
 pub mod turn;
 pub mod walk;
-pub mod reverse_hits;
 
 pub fn install() {
     //airdodge::install();
     cliff::install();
-    //dash::install();
+    dash::install();
     dead::install();
     guard_damage::install();
     guard_off::install();
@@ -34,8 +33,7 @@ pub fn install() {
     guard::install();
     jump::install();
     jumpsquat::install();
-    //turn::install();
-    //run::install();
-    //walk::install();
-    //reverse_hits::install();
+    turn::install();
+    run::install();
+    walk::install();
 }
